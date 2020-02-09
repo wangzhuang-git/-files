@@ -1,0 +1,32 @@
+dev_close_window ()
+dev_open_window (0, 0, 512, 512, 'black', WindowHandle)
+
+list_files ('D:/腾讯/微信/文件/WeChat Files/wxid_v8pj85fbpehv21/FileStorage/File/2020-01/防尘胶图片', 'files', Files)
+a:=[]
+b:=[]
+for i := 0 to |Files|-1 by 1
+    *读取图像
+    read_image (Image, Files[i])
+    *图像处理
+    rgb1_to_gray (Image, GrayImage) 
+    threshold (GrayImage, Regions, 0, 19)
+    connection (Regions, ConnectedRegions)
+    closing_circle (ConnectedRegions, RegionClosing, 3.5)
+    *选择区域
+    select_shape (RegionClosing, SelectedRegions, 'area', 'or', 110656, 154918)
+    area_center (SelectedRegions, Area, Row, Column)
+
+    *判断OK与NG
+    if (Area>120000)
+        a:=[a,i+'.OK'+'\n']
+    else
+        a:=[a,i+'.NG'+'\n']
+ 
+    endif
+    disp_message (WindowHandle, Area, 'window', 0, 0, 'black', 'true')
+    disp_message (WindowHandle, a[i], 'window', 0, 60, 'black', 'true')
+endfor 
+open_file ('1.txt', 'output', FileHandle)
+fwrite_string (FileHandle, a)
+fnew_line (FileHandle)
+close_file (FileHandle)
