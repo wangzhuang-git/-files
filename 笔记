@@ -1,0 +1,42 @@
+*求中心线
+lines_gauss (image, Lines, 1.5, 3, 8, 'light', 'true', 'bar-shaped', 'true')
+
+*区域作差
+difference (, , RegionDifference)
+*前region-后region
+
+*区域求和
+union2 (, , RegionUnion)
+
+*区域集合
+concat_obj (Lines, Lines, ObjectsConcat)
+*两者合并（区别是合并成两个区域）
+
+*求圆度
+circularity (ObjectsConcat, Circularity)
+
+*图像的边缘
+edges_sub_pix (ImageRoberts, Edges, 'canny', 1, 20, 40)
+
+*排序
+sort_region (ObjectsConcat, SortedRegions, 'first_point', 'true', 'row')
+
+
+
+
+*提取区域轮廓
+read_image (Image, 'fabrik')
+rgb1_to_gray (Image, GrayImage)
+threshold (GrayImage, Region, 128, 255)
+connection (Region, ConnectedRegions)
+select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', area_low,area_high )
+*轮廓提取
+edges_sub_pix (GrayImage, Edges1, 'canny', 1, 20, 40)
+*轮廓筛选（长度等特征）
+select_shape_xld (Edges1, SelectedXLD, 'area', 'and', 150, 99999)
+*轮廓连接
+union_adjacent_contours_xld (Edges1, UnionContours, 10, 1, 'attr_keep')
+
+
+*分割xld
+segment_contours_xld (UnionContours, ContoursSplit, 'lines_circles', 5, 4, 2)
